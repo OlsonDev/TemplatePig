@@ -151,10 +151,10 @@ You can also put empty folders in your template. They follow the same rules as f
 
 ## Extension settings
 This extension acknowledges the following settings:
-- `template-pig.templatesPath`
+- `templatePig.templatesPath`
   - The path for workspace-specific templates. 
   - Defaults to `".templates"`, which is effectively `"{root}/.templates"`.
-* `template-pig.globalTemplatesPath`
+* `templatePig.globalTemplatesPath`
   - The path for globally useful templates. 
   - Defaults to `null`.
 

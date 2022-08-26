@@ -5,5 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [1.0.0] - 2022-08-26
+## [0.0.2] - 2022-08-26
+- Declare VS Code configuration contributions so settings show up in Settings UI / JSON IntelliSense.
+- Change settings root key from `template-pig` to `templatePig` so VS Code Settings UI formats it as "Template Pig" instead of "Template-pig".
+
+## [0.0.1] - 2022-08-26
 - Initial release

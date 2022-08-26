@@ -4,8 +4,8 @@ import cmdUseTemplate from './cmd.useTemplate'
 
 export function activate(context: vscode.ExtensionContext) {
   console.log('Template Pig: Activated.')
-  const newTemplate = vscode.commands.registerCommand('template-pig.newTemplate', cmdNewTemplate)
-  const useTemplate = vscode.commands.registerCommand('template-pig.useTemplate', cmdUseTemplate)
+  const newTemplate = vscode.commands.registerCommand('templatePig.newTemplate', cmdNewTemplate)
+  const useTemplate = vscode.commands.registerCommand('templatePig.useTemplate', cmdUseTemplate)
 
   context.subscriptions.push(newTemplate)
   context.subscriptions.push(useTemplate)

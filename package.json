@@ -13,18 +13,33 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:template-pig.newTemplate",
-    "onCommand:template-pig.useTemplate"
+    "onCommand:templatePig.newTemplate",
+    "onCommand:templatePig.useTemplate"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Template Pig",
+      "properties": {
+        "templatePig.templatesPath": {
+          "type": "string",
+          "default": ".templates",
+          "description": "Controls where templates are created/discovered relative to a VS Code workspace."
+        },
+        "templatePig.globalTemplatesPath": {
+          "type": "string",
+          "default": "",
+          "description": "Controls where templates are created/discovered relative to this machine."
+        }
+      }
+    },
     "commands": [
       {
-        "command": "template-pig.newTemplate",
+        "command": "templatePig.newTemplate",
         "title": "Template Pig: New template"
       },
       {
-        "command": "template-pig.useTemplate",
+        "command": "templatePig.useTemplate",
         "title": "Template Pig: Use template"
       }
     ],
@@ -32,7 +47,7 @@
       "explorer/context": [
         {
           "when": "explorerResourceIsFolder",
-          "command": "template-pig.useTemplate",
+          "command": "templatePig.useTemplate",
           "group": "navigation@0"
         }
       ]

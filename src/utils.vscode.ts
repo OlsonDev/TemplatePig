@@ -2,7 +2,7 @@ import { existsSync, mkdirSync } from 'node:fs'
 import { isExistingDirectory, toFileUri } from './utils.fs'
 import * as vscode from 'vscode'
 
-export const readConfig = (key: string): any => vscode.workspace.getConfiguration('template-pig').get(key)
+export const readConfig = (key: string): any => vscode.workspace.getConfiguration('templatePig').get(key)
 export const showInfo = (message: string) => vscode.window.showInformationMessage(`Template Pig: ${message}`)
 export const showError = (message: string) => vscode.window.showErrorMessage(`Template Pig: ${message}`)
 
