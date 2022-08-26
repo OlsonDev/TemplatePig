@@ -1,4 +1,5 @@
 # Template Pig
+Create and use simple to complex file/folder templates.
 
 ## Features
 Animated GIF and description coming "soon."
