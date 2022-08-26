@@ -1,11 +1,14 @@
-import * as vscode from 'vscode';
-export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "template-pig" is now active!');
-	let disposable = vscode.commands.registerCommand('template-pig.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from TemplatePig!');
-	});
+import * as vscode from 'vscode'
+import cmdNewTemplate from './cmd.newTemplate'
+import cmdUseTemplate from './cmd.useTemplate'
 
-	context.subscriptions.push(disposable);
+export function activate(context: vscode.ExtensionContext) {
+  console.log('Template Pig: Activated.')
+  const newTemplate = vscode.commands.registerCommand('template-pig.newTemplate', cmdNewTemplate)
+  const useTemplate = vscode.commands.registerCommand('template-pig.useTemplate', cmdUseTemplate)
+
+  context.subscriptions.push(newTemplate)
+  context.subscriptions.push(useTemplate)
 }
 
-export function deactivate() {}
+export function deactivate() { }
