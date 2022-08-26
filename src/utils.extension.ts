@@ -1,25 +1,33 @@
-import _ from './utils.lodash'
+import { addIrregularRule, addPluralRule,  addSingularRule, addUncountableRule, isPlural, isSingular, plural, singular } from 'pluralize'
 import { existsSync, readdirSync } from 'node:fs'
 import { getFileContent } from './utils.fs'
-import { plural, singular } from 'pluralize'
 import { showInfo } from './utils.vscode'
+import * as _ from 'lodash'
+import * as $ from './utils.change-case'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
 const getTemplateContext = (name: string, templatePath: vscode.Uri): any => {
   const ctx = vm.createContext({
     _,
+    ...$,
+    addIrregularRule,
+    addPluralRule,
+    addSingularRule,
+    addUncountableRule,
+    isPlural,
+    isSingular,
     plural,
     singular,
-    prepicked: label => ({ label, key: _.pascalCase(label), picked: true }),
+    option: label => ({ label, key: $.pascalCase(label) }),
+    prepicked: label => ({ label, key: $.pascalCase(label), picked: true }),
     toPickedKeys: array => Object.assign({}, ...array.map(item => ({ [item.key ?? item.label]: true }))),
     showQuickPick: vscode.window.showQuickPick,
     showInputBox: vscode.window.showInputBox,
     pig: {
-      name,
+      name: $.sentenceCase(name),
       detail: null,
       description: null,
-      fileOptions: {},
       execute: (paths) => ({}),
       getDestinationPath: (sourceFilePath, context, paths) => sourceFilePath,
     },

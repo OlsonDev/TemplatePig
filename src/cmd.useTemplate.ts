@@ -1,10 +1,11 @@
-import _ from './utils.lodash'
+import * as _ from 'lodash'
 import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetPath, getWorkspaceUri, showError, showInfo } from './utils.vscode'
 import { getAvailableTemplates, pickTemplate } from './utils.extension'
 import { getFolderContents, getRelativePath, isExistingDirectory } from './utils.fs'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
+const skipRegex = /[\\/]\.pig(?:\.js|(?:ig)?nore)$/i
 export default async (resource: vscode.Uri | string | undefined) => {
   try {
     const workspaceUri = await getWorkspaceUri()
@@ -25,7 +26,7 @@ export default async (resource: vscode.Uri | string | undefined) => {
     // - Second to render templates
     // - Third to save files/folders and open them
     for (const item of templateContents) {
-      if (item.uri.fsPath.toLowerCase().endsWith('.pig.js')) {
+      if (skipRegex.test(item.uri.fsPath)) {
         item.skip = true
         continue
       }

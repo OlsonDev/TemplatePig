@@ -1,4 +1,4 @@
-import _ from './utils.lodash'
+import * as _ from 'lodash'
 import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs'
 import { normalize } from 'node:path'
 import * as vscode from 'vscode'
@@ -30,6 +30,8 @@ export const getFolderContents = (uri: vscode.Uri) => {
       content: getFileContent(vscode.Uri.joinPath(uri, dirent.name)),
     }]
   )
+
+  // TODO: If they have a .pignore/.pigignore file, should also add the { type: 'dir' } entry
 
   return allPaths.length
     ? allPaths.flat(Infinity)
