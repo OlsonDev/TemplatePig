@@ -5,6 +5,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "repository": "github:OlsonDev/TemplatePig",
+  "publisher": "OlsonDev",
   "engines": {
     "vscode": "^1.70.0"
   },
