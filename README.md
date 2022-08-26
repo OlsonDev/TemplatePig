@@ -104,7 +104,7 @@ You can also put empty folders in your template. They follow the same rules as f
   - `pig.description` is like `pig.detail` in all ways except it's put below `pig.name`.
 - Several useful libraries and functions are injected and available globally.
   - [Lodash](https://lodash.com), available as the traditional `_`.
-  - ['change-case'](https://github.com/blakeembrey/change-case) (both core and some of the more useful non-core functions), available globally:
+  - [change-case](https://github.com/blakeembrey/change-case) (both core and some of the more useful non-core functions), available globally:
     - `camelCase()`
     - `capitalCase()`
     - `constantCase()`
