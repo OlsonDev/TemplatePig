@@ -21,7 +21,7 @@ pig.detail = 'Add documentation to this project.'
 // Executed when this user is selected by the user, or if the
 // .templates folder only has a single template.
 pig.executeAsync = async () => {
-  // Use VS Code API to prompt user about how they'd like to customize this template instance.
+  // Use VS Code API to prompt user about how they’d like to customize this template instance.
   const title = await showInputBox({ 
     title: 'What are you documenting?', 
     placeHolder: 'Title', 
@@ -50,7 +50,7 @@ ${sections.Settings ? '## Settings\n- ' : ''}
 
 ${sections.KnownIssues ? '## Known issues\n- ' : ''}
 ```
-- Notice we’re using [JavaScript template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) syntax to interpolate values from the *context* returned from `pig.executeAsync(…)`.
+- Notice we’re using [JavaScript template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) syntax to interpolate values from the *context* returned from `pig.executeAsync(…)` (they’re available globally).
 - Also note that of course this document will result in a bunch of whitespace if a `sectionOptions` option is unselected. That’s up to you to make your template pretty.
 
 ## Use a template
@@ -69,7 +69,7 @@ So far you’ve seen being able to right-click a folder and instantiate your tem
 pig.getDestinationPath = (sourcePath, context, paths) => {
   // `sourcePath` will be relative to this template subfolder (no leading forward slash).
   // `context` is the value your `pig.executeAsync(…)` returned.
-  // `paths.workspaceUri` is your project's root directory.
+  // `paths.workspaceUri` is your project’s root directory.
   // `paths.targetUri` is where the template was instantiated (typically which folder was right-clicked).
   // Keep in mind this `switch`’s `case`s are case-sensitive!
   switch (sourcePath) {
@@ -101,7 +101,7 @@ You can also put empty folders in your template. They follow the same rules as f
 - `pig.name`, `pig.detail`, and `pig.description` are used to describe your template when the user is prompted about which template they’d like to instantiate.
   - `pig.name` is defaulted to the sentence-case version of your folder; you don’t have to set it!
   - `pig.detail` is put next to `pig.name` in a dimmer text. It may be cropped, but hovering it will reveal the entirety of the text.
-  - `pig.description` is like `pig.detail` in all ways except it's put below `pig.name`.
+  - `pig.description` is like `pig.detail` in all ways except it’s put below `pig.name`.
 - Several useful libraries and functions are injected and available globally.
   - [Lodash](https://lodash.com), available as the traditional `_`.
   - [change-case](https://github.com/blakeembrey/change-case) (both core and some of the more useful non-core functions), available globally:
@@ -140,7 +140,7 @@ You can also put empty folders in your template. They follow the same rules as f
     - [`showInputBox()`](https://code.visualstudio.com/api/references/vscode-api#InputBox)
   - Template Pig specific:
     - `option(label)`
-      - Builds an option object with the given `label`, and a `key` that's the `pascalCase`-ified `label`.
+      - Builds an option object with the given `label`, and a `key` that’s the `pascalCase`-ified `label`.
       - The `key` is useful in combination with `toPickedKeys()` below.
     - `prepicked(label)`
       - Builds an option object like `option(label)` but also sets `picked: true`.
