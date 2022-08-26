@@ -1,4 +1,7 @@
 export * from 'change-case'
+export { paramCase as kebabCase } from 'change-case'
+export { noCase as lowerSentenceCase } from 'change-case'
+export { noCase as spaceCase } from 'change-case'
 export { titleCase } from 'title-case'
 export { lowerCase, localeLowerCase } from 'lower-case'
 export { lowerCaseFirst } from 'lower-case-first'

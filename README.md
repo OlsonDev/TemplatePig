@@ -116,8 +116,8 @@ You can also put empty folders in your template. They follow the same rules as f
     - `localeUpperCaseFirst()`
     - `lowerCase()`
     - `lowerCaseFirst()`
-    - `noCase()`
-    - `paramCase()`
+    - `noCase()` (also aliased as `lowerSentenceCase()` and `spaceCase()`)
+    - `paramCase()` (also aliased as `kebabCase()`)
     - `pascalCase()`
     - `pathCase()`
     - `sentenceCase()`
