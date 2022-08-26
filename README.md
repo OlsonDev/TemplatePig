@@ -51,7 +51,7 @@ ${sections.Settings ? '## Settings\n- ' : ''}
 ${sections.KnownIssues ? '## Known issues\n- ' : ''}
 ```
 - Notice we’re using [JavaScript template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) syntax to interpolate values from the *context* returned from `pig.executeAsync(…)` (they’re available globally).
-- Also note that of course this document will result in a bunch of whitespace if a `sectionOptions` option is unselected. That’s up to you to make your template pretty.
+- Also note that of course this document will result in a bunch of whitespace if a `sectionOptions` option is unselected. That’s up to you to make your rendered template pretty.
 
 ## Use a template
 - In VS Code, right-click a folder (or your workspace root) and select `Template Pig: Use template`.
