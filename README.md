@@ -138,6 +138,9 @@ You can also put empty folders in your template. They follow the same rules as f
   - From VS Code API:
     - [`showQuickPick()`](https://code.visualstudio.com/api/references/vscode-api#QuickPick<T>)
     - [`showInputBox()`](https://code.visualstudio.com/api/references/vscode-api#InputBox)
+    - [`QuickPickItemKind`](https://code.visualstudio.com/api/references/vscode-api#QuickPickItemKind)
+      - Official documentation is currently lacking, but there's two useful values: `Separator` and `Default`.
+    - [`QuickInputButtons`](https://code.visualstudio.com/api/references/vscode-api#QuickInputButtons)
   - Template Pig specific:
     - `option(label)`
       - Builds an option object with the given `label`, and a `key` that’s the `pascalCase`-ified `label`.

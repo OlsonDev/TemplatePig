@@ -24,6 +24,10 @@ const getTemplateContext = (name: string, pigJsPath: vscode.Uri): any => {
     toPickedKeys: array => Object.assign({}, ...array.map(item => ({ [item.key ?? item.label]: true }))),
     showQuickPick: vscode.window.showQuickPick,
     showInputBox: vscode.window.showInputBox,
+    /* eslint-disable @typescript-eslint/naming-convention */
+    QuickPickItemKind: vscode.QuickPickItemKind,
+    QuickInputButtons: vscode.QuickInputButtons,
+    /* eslint-enable @typescript-eslint/naming-convention */
     pig: {
       name: $.sentenceCase(name),
       detail: null,
