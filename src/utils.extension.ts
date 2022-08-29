@@ -1,13 +1,13 @@
 import { addIrregularRule, addPluralRule,  addSingularRule, addUncountableRule, isPlural, isSingular, plural, singular } from 'pluralize'
 import { existsSync, readdirSync } from 'node:fs'
 import { getFileContent } from './utils.fs'
-import { showInfo } from './utils.vscode'
+import { showException } from './utils.vscode'
 import * as _ from 'lodash'
 import * as $ from './utils.change-case'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
-const getTemplateContext = (name: string, templatePath: vscode.Uri): any => {
+const getTemplateContext = (name: string, pigJsPath: vscode.Uri): any => {
   const ctx = vm.createContext({
     _,
     ...$,
@@ -33,14 +33,15 @@ const getTemplateContext = (name: string, templatePath: vscode.Uri): any => {
     },
   })
 
-  if (!existsSync(templatePath.fsPath)) return ctx
+  if (!existsSync(pigJsPath.fsPath)) return ctx
   try {
-    const script = getFileContent(templatePath)
+    const script = getFileContent(pigJsPath)
     if (!script) return ctx
     vm.runInContext(script, ctx)
     return ctx
   } catch (ex) {
-    showInfo(`Error running script: ${templatePath.fsPath}:\n${ex}`)
+    showException(ex, name, `getting metadata from template`, pigJsPath)
+    return
   }
 }
 
@@ -50,8 +51,9 @@ export const getAvailableTemplates = async (templatesPath: vscode.Uri) => {
     .map(async (dirent) => {
       if (!dirent.isDirectory()) return null
       const path = vscode.Uri.joinPath(templatesPath, dirent.name)
-      const context = getTemplateContext(dirent.name, vscode.Uri.joinPath(path, '.pig.js'))
-      return { path, context }
+      const pigJsPath = vscode.Uri.joinPath(path, '.pig.js')
+      const context = getTemplateContext(dirent.name, pigJsPath)
+      return { path, name: dirent.name, pigJsPath, context }
     })))
     .filter(Boolean)
 }

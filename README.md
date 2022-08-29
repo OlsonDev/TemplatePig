@@ -163,5 +163,4 @@ This extension acknowledges the following settings:
 - Files are always overwritten without prompt.
 
 ## Release notes
-### 0.0.1
-Initial release of Template Pig.
+### See [`CHANGELOG.md`](CHANGELOG.md)

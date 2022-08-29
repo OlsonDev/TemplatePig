@@ -3,8 +3,30 @@ import { isExistingDirectory, toFileUri } from './utils.fs'
 import * as vscode from 'vscode'
 
 export const readConfig = (key: string): any => vscode.workspace.getConfiguration('templatePig').get(key)
-export const showInfo = (message: string) => vscode.window.showInformationMessage(`Template Pig: ${message}`)
-export const showError = (message: string) => vscode.window.showErrorMessage(`Template Pig: ${message}`)
+export const showInfo = (message: string, options = {}, ...items) => vscode.window.showInformationMessage(`Template Pig » ${message}`, options, ...items)
+export const showError = (message: string, options = {}, ...items) => vscode.window.showErrorMessage(`Template Pig » ${message}`, options, ...items)
+export const showException = (ex, templateName, whileDoing, badUri) => {
+  const lines = [`${templateName} » Uncaught exception while ${whileDoing}:`]
+  if (ex.message) lines.push(ex.message)
+  if (ex.stack) lines.push(ex.stack)
+  if (!ex.message && !ex.stack) lines.push(ex.toString())
+  const openFile = `Open file ${badUri.fsPath.replace(/.*?([^\\]*)$/, '$1')}`
+  const copyStack = 'Copy stack trace'
+  const btns = []
+  btns.push(openFile)
+  if (ex.stack) btns.push(copyStack)
+  showError(lines.join('\n'), null, ...btns).then(selection => {
+    switch (selection) {
+      case openFile:
+        vscode.window.showTextDocument(badUri, { preview: false })
+        break
+      case copyStack:
+        vscode.env.clipboard.writeText(ex.stack)
+        break
+    }
+    return false
+  })
+}
 
 const parentFolderOfActiveFile = () => {
   const currentFolderUri = vscode.window.activeTextEditor?.document?.uri

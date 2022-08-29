@@ -1,5 +1,5 @@
 import * as _ from 'lodash'
-import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetPath, getWorkspaceUri, showError, showInfo } from './utils.vscode'
+import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetPath, getWorkspaceUri, showError, showException, showInfo } from './utils.vscode'
 import { getAvailableTemplates, pickTemplate } from './utils.extension'
 import { getFolderContents, getRelativePath, isExistingDirectory } from './utils.fs'
 import * as vm from 'node:vm'
@@ -17,7 +17,12 @@ export default async (resource: vscode.Uri | string | undefined) => {
     const template = await pickTemplate(templates)
     if (!template) return showInfo('No template selected')
     const paths = { workspaceUri, targetUri }
-    const context = await template.context.pig.executeAsync(paths)
+    let context
+    try {
+      context = await template.context.pig.executeAsync(paths)
+    } catch (ex) {
+      return showException(ex, template.name, 'calling executeAsync(…)', template.pigJsPath)
+    }
     if (!context) return showInfo('Aborted')
     const templateContents = getFolderContents(template.path)
 
@@ -31,7 +36,11 @@ export default async (resource: vscode.Uri | string | undefined) => {
         continue
       }
       item.sourcePath = getRelativePath(template.path, item.uri)
-      item.destinationPath = template.context.pig.getDestinationPath(item.sourcePath, context, paths)
+      try {
+        item.destinationPath = template.context.pig.getDestinationPath(item.sourcePath, context, paths)
+      } catch (ex) {
+        return showException(ex, template.name, `calling getDestinationPath("${item.sourcePath.replace('"', '\\"')}", …)`, template.pigJsPath)
+      }
       if (!item.destinationPath) {
         item.skip = true
         continue
@@ -42,7 +51,11 @@ export default async (resource: vscode.Uri | string | undefined) => {
     for (const item of templateContents) {
       if (item.skip || item.type === 'dir') continue
       const thisTemplateContext = vm.createContext(_.cloneDeep(_.omit(context, 'pig')))
-      item.renderedContent = vm.runInContext(`(() => \`${item.content}\`)()`, thisTemplateContext)
+      try {
+        item.renderedContent = vm.runInContext(`(() => \`${item.content}\`)()`, thisTemplateContext)
+      } catch (ex) {
+        return showException(ex, template.name, `rendering template ${item.sourcePath}`, item.uri)
+      }
     }
 
     await createTemplateContents(templateContents.filter(item => !item.skip))

@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.0.4] - 2022-08-29
+- Uncaught exceptions now reported to user when getting metadata from a template, calling `executeAsync(…)`, rendering templates, or calling `getDestinationPath(…)` with buttons to view the stack trace or open the file that likely caused the issue.
+
 ## [0.0.3] - 2022-08-26
 - Alias `change-case`'s `paramCase` method to `kebabCase`.
 - Alias `change-case`'s `noCase` method to both `lowerSentenceCase` and `spaceCase`.
