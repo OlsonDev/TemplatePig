@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [0.0.4] - 2022-08-29
+## [0.0.6] - 2022-08-29
+- `.pig.js` now has `Uri` in context from `vscode`.
+- `.pig.js` now has `getFileContent`, `getFolderContents`, `getRelativePath`, and `toFileUri` in context from Template Pig.
+
+## [0.0.5] - 2022-08-29
 - `.pig.js` now has both `QuickPickItemKind` and `QuickInputButtons` in context from `vscode`.
 
 ## [0.0.4] - 2022-08-29

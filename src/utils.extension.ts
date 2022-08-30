@@ -1,6 +1,6 @@
 import { addIrregularRule, addPluralRule,  addSingularRule, addUncountableRule, isPlural, isSingular, plural, singular } from 'pluralize'
 import { existsSync, readdirSync } from 'node:fs'
-import { getFileContent } from './utils.fs'
+import { getFileContent, getFolderContents, getRelativePath, toFileUri } from './utils.fs'
 import { showException } from './utils.vscode'
 import * as _ from 'lodash'
 import * as $ from './utils.change-case'
@@ -24,7 +24,12 @@ const getTemplateContext = (name: string, pigJsPath: vscode.Uri): any => {
     toPickedKeys: array => Object.assign({}, ...array.map(item => ({ [item.key ?? item.label]: true }))),
     showQuickPick: vscode.window.showQuickPick,
     showInputBox: vscode.window.showInputBox,
+    getFileContent,
+    getFolderContents,
+    getRelativePath,
+    toFileUri,
     /* eslint-disable @typescript-eslint/naming-convention */
+    Uri: vscode.Uri,
     QuickPickItemKind: vscode.QuickPickItemKind,
     QuickInputButtons: vscode.QuickInputButtons,
     /* eslint-enable @typescript-eslint/naming-convention */
