@@ -44,7 +44,7 @@ export const getWorkspaceUri = async () => {
   return folders[0]?.uri
 }
 
-export const getTargetPath = async (resource: vscode.Uri | string | undefined, workspaceUri: vscode.Uri | undefined) => {
+export const getTargetUri = async (resource: vscode.Uri | string | undefined, workspaceUri: vscode.Uri | undefined) => {
   if (typeof resource === 'string') {
     if (resource === '__current') return parentFolderOfActiveFile()
     if (!workspaceUri) {

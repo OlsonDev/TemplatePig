@@ -1,15 +1,15 @@
-import * as _ from 'lodash'
-import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetPath, getWorkspaceUri, showError, showException, showInfo } from './utils.vscode'
+import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetUri, getWorkspaceUri, showError, showException, showInfo } from './utils.vscode'
 import { getAvailableTemplates, pickTemplate } from './utils.extension'
 import { getFolderContents, getRelativePath, isExistingDirectory } from './utils.fs'
+import * as _ from 'lodash'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
-const skipRegex = /[\\/]\.pig(?:\.js|(?:ig)?nore)$/i
+
 export default async (resource: vscode.Uri | string | undefined) => {
   try {
     const workspaceUri = await getWorkspaceUri()
-    const targetUri = await getTargetPath(resource, workspaceUri)
+    const targetUri = await getTargetUri(resource, workspaceUri)
     const templatePaths = [await getLocalTemplatePath(targetUri), await getGlobalTemplatePath()]
     const validPaths = templatePaths.filter(isExistingDirectory)
     const templates = (await Promise.all(validPaths.map(async (path) => await getAvailableTemplates(path)))).flat()
@@ -21,31 +21,33 @@ export default async (resource: vscode.Uri | string | undefined) => {
     try {
       context = await template.context.pig.executeAsync(paths)
     } catch (ex) {
-      return showException(ex, template.name, 'calling executeAsync(…)', template.pigJsPath)
+      return showException(ex, template.name, 'calling executeAsync(…)', template.pigJsUri)
     }
     if (!context) return showInfo('Aborted')
-    const templateContents = getFolderContents(template.path)
+    const templateContents = getFolderContents(template.uri)
 
     // Process templateContents twice:
     // - First to get destination file paths (or if a file should be skipped)
     // - Second to render templates
     // - Third to save files/folders and open them
-    for (const item of templateContents) {
-      if (skipRegex.test(item.uri.fsPath)) {
-        item.skip = true
-        continue
-      }
-      item.sourcePath = getRelativePath(template.path, item.uri)
+    for (const entry of templateContents) {
+      entry.sourcePath = getRelativePath(template.uri, entry.uri)
       try {
-        item.destinationPath = template.context.pig.getDestinationPath(item.sourcePath, context, paths)
+        // Pluck a few properties so they can't mutate the item itself.
+        const slimItem = { 
+          sourcePath: entry.sourcePath, 
+          dirent: entry.dirent, 
+          uri: entry.uri,
+        }
+        entry.destinationPath = template.context.pig.getDestinationPath(slimItem, context, paths)
       } catch (ex) {
-        return showException(ex, template.name, `calling getDestinationPath("${item.sourcePath.replace('"', '\\"')}", …)`, template.pigJsPath)
+        return showException(ex, template.name, `calling getDestinationPath("${entry.sourcePath.replace('"', '\\"')}", …)`, template.pigJsUri)
       }
-      if (!item.destinationPath) {
-        item.skip = true
+      if (!entry.destinationPath) {
+        entry.skip = true
         continue
       }
-      item.absoluteDestinationFilePath = vscode.Uri.joinPath(item.destinationPath.startsWith('/') ? workspaceUri : targetUri, item.destinationPath)
+      entry.absoluteDestinationFilePath = vscode.Uri.joinPath(entry.destinationPath.startsWith('/') ? workspaceUri : targetUri, entry.destinationPath)
     }
 
     for (const item of templateContents) {

@@ -28,7 +28,6 @@ pig.executeAsync = async () => {
     prompt: 'Should be singular'
   })
   if (!title) return // Returning a falsy value (undefined here) aborts template instantiation.
-  return { title }
 
   const sectionOptions = [ prepicked('Features'), prepicked('Settings'), prepicked('Known issues') ]
   const selectedSections = await showQuickPick(baseClassOptions, { title: 'Which sections would you like?', canPickMany: true })
@@ -66,12 +65,17 @@ ${sections.KnownIssues ? '## Known issues\n- ' : ''}
 So far you’ve seen being able to right-click a folder and instantiate your template there. But, what if you want some files to wind up there, but others need to go in specific places in your project? That’s where `pig.getDestinationPath(…)` comes in! Just add something like this in your `.pig.js` file:
 ```js
 // Executed after all files were rendered to determine where to save them to.
-pig.getDestinationPath = (sourcePath, context, paths) => {
-  // `sourcePath` will be relative to this template subfolder (no leading forward slash).
+// Called for each source path found in your template, following the rules mentioned for `getFolderContents(uri)` below.
+pig.getDestinationPath = (entry, context, paths) => {
+  // `entry` is an object representing a file or folder.
+  // `entry.sourcePath` is a string that will be relative to this template subfolder (no leading forward slash).
+  // `entry.uri` is a `file`-schemed VS Code Uri object pointing to this item.
+  // `entry.dirent` is a Node.js fs.Dirent object related to this item. You can determine if it’s a file or folder by using `entry.dirent.isFile()` or `entry.dirent.isDirectory()`.
   // `context` is the value your `pig.executeAsync(…)` returned.
-  // `paths.workspaceUri` is your project’s root directory.
+  // `paths.workspaceUri` is your project’s root folder.
   // `paths.targetUri` is where the template was instantiated (typically which folder was right-clicked).
   // Keep in mind this `switch`’s `case`s are case-sensitive!
+  const { sourcePath } = entry
   switch (sourcePath) {
     // Here we’re creating a subfolder "docs" within the folder the user right-clicked.
     // We’re also renaming the file to something more descriptive.
@@ -90,12 +94,12 @@ pig.getDestinationPath = (sourcePath, context, paths) => {
 ```
 
 ## Empty folders
-You can also put empty folders in your template. They follow the same rules as files in `pig.getDestinationPath(…)`:
+You can also put empty folders in your template. They follow the same rules as files when passed to `pig.getDestinationPath(…)`:
 - They can be placed relative to the target.
 - They can be placed relative to the workspace root.
 - They can be renamed! This also means you can make a template-root-level folder actually be nested several folders deep; you just need a placeholder to tell Template Pig to ask about it in `pig.getDestinationPath(…)`.
 - Do note that `git` and some other version control systems (VCS) will not version this folder.
-  - To work around this, you can add an empty `.pignore` or `.pigignore` file to the directory.
+  - To work around this, you can add an empty `.pignore` or `.pigignore` file to the folder.
 
 ## More on `.pig.js`
 - `pig.name`, `pig.detail`, and `pig.description` are used to describe your template when the user is prompted about which template they’d like to instantiate.
@@ -151,6 +155,19 @@ You can also put empty folders in your template. They follow the same rules as f
       - Converts `[{ key: 'Foo' }, { key: 'Bar' }, { key: 'Baz' }]` to `{ Foo: true, Bar: true, Baz: true }`.
       - You likely will get an array similar to above when calling `showQuickPick(options, { canPickMany: true })`.
       - This is useful so your templates can simply `${selected.Foo ? 'Foo stuff' : ''}` instead of `selected.includes('Foo')`.
+    - `getFileContent(uri)`
+      - Returns the file’s content as a string, read with UTF-8 encoding.
+      - Returns `null` if there’s an error reading the file.
+    - `getFolderContents(uri)`
+      - Returns an [`async` generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
+      - Yields files and folders underneath the `uri`.
+      - Skips files named `.pig.js`, `.pignore`, and `.pigignore`.
+      - Only yields folders when they don’t yield child items. That is, it’ll only yield a folder that’s either empty or only contains some combination of the aforementioned specific files. Or has symbolic links or other weird stuff (that’d be skipped).
+    - `getRelativePath(ancestorUri, descendantUri)`
+      - Given `Uri`s pointing to `C:\Foo\Bar` and `C:\Foo\Bar\Baz\Qux.txt`, returns the string `'Baz\Qux.txt'`
+      - Does **not** handle cases when `descendantUri` is actually a sibling or ancestor's descendant.
+    - `toFileUri(path)`
+      - Returns path normalized then wrapped in a VS Code `Uri` object with the file scheme.
 
 ## Extension settings
 This extension acknowledges the following settings:

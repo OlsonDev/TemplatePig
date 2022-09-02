@@ -7,7 +7,7 @@ import * as $ from './utils.change-case'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
-const getTemplateContext = (name: string, pigJsPath: vscode.Uri): any => {
+const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
   const ctx = vm.createContext({
     _,
     ...$,
@@ -38,31 +38,31 @@ const getTemplateContext = (name: string, pigJsPath: vscode.Uri): any => {
       detail: null,
       description: null,
       execute: (paths) => ({}),
-      getDestinationPath: (sourceFilePath, context, paths) => sourceFilePath,
+      getDestinationPath: (entry, context, paths) => entry.sourcePath,
     },
   })
 
-  if (!existsSync(pigJsPath.fsPath)) return ctx
+  if (!existsSync(pigJsUri.fsPath)) return ctx
   try {
-    const script = getFileContent(pigJsPath)
+    const script = getFileContent(pigJsUri)
     if (!script) return ctx
     vm.runInContext(script, ctx)
     return ctx
   } catch (ex) {
-    showException(ex, name, `getting metadata from template`, pigJsPath)
+    showException(ex, name, `getting metadata from template`, pigJsUri)
     return
   }
 }
 
-export const getAvailableTemplates = async (templatesPath: vscode.Uri) => {
-  const templates = readdirSync(templatesPath.fsPath, { withFileTypes: true })
+export const getAvailableTemplates = async (templatesUri: vscode.Uri) => {
+  const templates = readdirSync(templatesUri.fsPath, { withFileTypes: true })
   return (await Promise.all(templates
     .map(async (dirent) => {
       if (!dirent.isDirectory()) return null
-      const path = vscode.Uri.joinPath(templatesPath, dirent.name)
-      const pigJsPath = vscode.Uri.joinPath(path, '.pig.js')
-      const context = getTemplateContext(dirent.name, pigJsPath)
-      return { path, name: dirent.name, pigJsPath, context }
+      const uri = vscode.Uri.joinPath(templatesUri, dirent.name)
+      const pigJsUri = vscode.Uri.joinPath(uri, '.pig.js')
+      const context = getTemplateContext(dirent.name, pigJsUri)
+      return { uri, name: dirent.name, pigJsUri, context }
     })))
     .filter(Boolean)
 }
