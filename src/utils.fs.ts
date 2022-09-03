@@ -21,20 +21,31 @@ export const isExistingDirectory = (path: string | vscode.Uri | null) => {
   return existsSync(path) && lstatSync(path).isDirectory()
 }
 
-export async function* getFolderContents(directoryUri: vscode.Uri) {
+// Folders are considered empty if they only contain files that would otherwise
+// be excluded via `excludeFiles`, which defaults to Template Pig files (.pig.js, .pignore, .pigignore)
+// By default, only empty folders are yielded. If you set `yieldNonEmptyFolders` to true, then
+// all folders will be yielded.
+export const getFolderContents = (
+  directoryUri: vscode.Uri,
+  {
+    yieldNonEmptyFolders = false,
+    excludeFiles = ['.pig.js', '.pignore', '.pigignore'],
+  } = {}
+) => getFolderContentsImpl(directoryUri, { yieldNonEmptyFolders, excludeFiles })
+
+async function* getFolderContentsImpl(directoryUri: vscode.Uri, options) {
   for await (const dirent of await opendir(directoryUri.fsPath)) {
     const uri = vscode.Uri.joinPath(directoryUri, dirent.name)
-    // If a directory has yieldable items, don't bother yielding the directory itself.
-    // yieldable items are subdirectories and files, excluding .pig.js, .pignore, and .pigignore files.
     if (dirent.isDirectory()) {
       let yielded = false
-      const items = getFolderContents(uri)
-      for await (const content of items) {
-        yield content
+      const items = getFolderContentsImpl(uri, options)
+      for await (const item of items) {
+        if (!yielded && options.yieldNonEmptyFolders) yield { uri, dirent, content: null }
         yielded = true
+        yield item
       }
       if (!yielded) yield { uri, dirent, content: null }
-    } else if (dirent.isFile() && !['.pig.js', '.pignore', '.pigignore'].includes(dirent.name.toLowerCase())) {
+    } else if (dirent.isFile() && !options.excludeFiles.includes(dirent.name.toLowerCase())) {
       yield {
         uri,
         dirent,

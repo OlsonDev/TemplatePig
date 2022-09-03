@@ -158,11 +158,13 @@ You can also put empty folders in your template. They follow the same rules as f
     - `getFileContent(uri)`
       - Returns the file’s content as a string, read with UTF-8 encoding.
       - Returns `null` if there’s an error reading the file.
-    - `getFolderContents(uri)`
+    - `getFolderContents(uri, options = {…})`
       - Returns an [`async` generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
       - Yields files and folders underneath the `uri`.
       - Skips files named `.pig.js`, `.pignore`, and `.pigignore`.
-      - Only yields folders when they don’t yield child items. That is, it’ll only yield a folder that’s either empty or only contains some combination of the aforementioned specific files. Or has symbolic links or other weird stuff (that’d be skipped).
+      - `options.yieldNonEmptyFolders`: defaults to `false`.
+        - By default, only yields folders when they don’t yield child items. That is, it’ll only yield a folder that’s either empty or only contains some combination of the aforementioned specific files. Or has symbolic links or other weird stuff (that’d be skipped).
+      - `options.maxDepth`: defaults to `Infinity`. Specifies how many folders deep would you like to go.
     - `getRelativePath(ancestorUri, descendantUri)`
       - Given `Uri`s pointing to `C:\Foo\Bar` and `C:\Foo\Bar\Baz\Qux.txt`, returns the string `'Baz\Qux.txt'`
       - Does **not** handle cases when `descendantUri` is actually a sibling or ancestor's descendant.

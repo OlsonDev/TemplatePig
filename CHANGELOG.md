@@ -5,12 +5,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.0.2] - 2022-09-03
+- `getFolderContents(…)` now takes in an options object as 2nd parameter.
+  - `getFolderContents(…)` can now yield non-empty folders if you specify `{ yieldNonEmptyFolders: true }`.
+  - `getFolderContents(…)` can now exclude custom files instead of/in addition to `.pig.js`, `.pignore`, and `.pigignore` if you specify `{ excludeFiles: ['example.txt'] }`.
+
 ## [1.0.1] - 2022-09-03
 - Fix bugs
 
 ## [1.0.0] - 2022-09-02
 - `getDestinationPath(…)`’s first argument is no longer the `sourcePath`, but instead is an object with the `sourcePath`, `uri`, and `dirent` object.
-- `getFolderContents(…)` now returns an [`async` generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator) which `yield`s all files, but only folders which don’t yield other descendant.
+- `getFolderContents(…)` now returns an [`async` generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator) which `yield`s all files, but only folders which don’t yield other descendant items.
   - Files named `.pig.js`, `.pignore`, and `.pigignore` aren’t `yield`ed.
 - Cleaned up some internal things to more correctly refer to things as paths and URIs.
 
