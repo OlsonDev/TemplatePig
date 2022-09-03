@@ -1,4 +1,4 @@
-import { addIrregularRule, addPluralRule,  addSingularRule, addUncountableRule, isPlural, isSingular, plural, singular } from 'pluralize'
+import { addIrregularRule, addPluralRule, addSingularRule, addUncountableRule, isPlural, isSingular, plural, singular } from 'pluralize'
 import { existsSync, readdirSync } from 'node:fs'
 import { getFileContent, getFolderContents, getRelativePath, toFileUri } from './utils.fs'
 import { showException } from './utils.vscode'

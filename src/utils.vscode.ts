@@ -91,7 +91,7 @@ const start = new vscode.Position(0, 0)
 const end = new vscode.Position(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
 const range = new vscode.Range(start, end)
 const createFileOrDirectory = async (wsEdit: vscode.WorkspaceEdit, item) => {
-  if (item.type === 'dir') {
+  if (item.dirent.isDirectory()) {
     mkdirSync(item.absoluteDestinationFilePath.fsPath, { recursive: true })
     return null
   }
@@ -120,7 +120,7 @@ export const createTemplateContents = async (templateContents: any[]) => {
   //       and potentially even which panel (top/bottom/left/right) they'd end up in.
   setTimeout(async () => {
     for (const item of templateContents) {
-      if (item.type === 'dir') continue
+      if (item.dirent.isDirectory()) continue
       await openAndSaveFile(item.absoluteDestinationFilePath)
     }
   }, 1000)

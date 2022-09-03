@@ -35,8 +35,8 @@ export async function* getFolderContents(directoryUri: vscode.Uri) {
       }
       if (!yielded) yield { uri, dirent, content: null }
     } else if (dirent.isFile() && !['.pig.js', '.pignore', '.pigignore'].includes(dirent.name.toLowerCase())) {
-      yield { 
-        uri, 
+      yield {
+        uri,
         dirent,
         get content() { return getFileContent(uri) }
       }

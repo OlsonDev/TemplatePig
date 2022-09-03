@@ -34,9 +34,9 @@ export default async (resource: vscode.Uri | string | undefined) => {
       entry.sourcePath = getRelativePath(template.uri, entry.uri)
       try {
         // Pluck a few properties so they can't mutate the item itself.
-        const slimItem = { 
-          sourcePath: entry.sourcePath, 
-          dirent: entry.dirent, 
+        const slimItem = {
+          sourcePath: entry.sourcePath,
+          dirent: entry.dirent,
           uri: entry.uri,
         }
         entry.destinationPath = template.context.pig.getDestinationPath(slimItem, context, paths)
@@ -51,7 +51,7 @@ export default async (resource: vscode.Uri | string | undefined) => {
     }
 
     for (const item of templateContents) {
-      if (item.skip || item.type === 'dir') continue
+      if (item.skip || item.dirent.isDirectory()) continue
       const thisTemplateContext = vm.createContext(_.cloneDeep(_.omit(context, 'pig')))
       try {
         item.renderedContent = vm.runInContext(`(() => \`${item.content}\`)()`, thisTemplateContext)
