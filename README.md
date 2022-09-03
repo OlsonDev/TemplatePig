@@ -170,6 +170,8 @@ You can also put empty folders in your template. They follow the same rules as f
       - Does **not** handle cases when `descendantUri` is actually a sibling or ancestor's descendant.
     - `toFileUri(path)`
       - Returns path normalized then wrapped in a VS Code `Uri` object with the file scheme.
+    - `log(value)`
+      - Logs `value` to the VS Code "Template Pig" output channel.
 
 ## Extension settings
 This extension acknowledges the following settings:

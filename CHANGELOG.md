@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.0.3] - 2022-09-03
+- `.pig.js` now has `log(…)` in context from Template Pig.
+
 ## [1.0.2] - 2022-09-03
 - `getFolderContents(…)` now takes in an options object as 2nd parameter.
   - `getFolderContents(…)` can now yield non-empty folders if you specify `{ yieldNonEmptyFolders: true }`.

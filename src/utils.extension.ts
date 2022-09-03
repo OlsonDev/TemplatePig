@@ -7,6 +7,8 @@ import * as $ from './utils.change-case'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
+const outputChannel = vscode.window.createOutputChannel('Template Pig', 'md')
+
 const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
   const ctx = vm.createContext({
     _,
@@ -28,6 +30,7 @@ const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
     getFolderContents,
     getRelativePath,
     toFileUri,
+    log: value => outputChannel.appendLine(`${ctx.pig.name}: ${value}`),
     /* eslint-disable @typescript-eslint/naming-convention */
     Uri: vscode.Uri,
     QuickPickItemKind: vscode.QuickPickItemKind,
