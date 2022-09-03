@@ -26,11 +26,13 @@ export default async (resource: vscode.Uri | string | undefined) => {
     if (!context) return showInfo('Aborted')
     const templateContents = getFolderContents(template.uri)
 
-    // Process templateContents twice:
+    // Process templateContents multiple times:
     // - First to get destination file paths (or if a file should be skipped)
     // - Second to render templates
     // - Third to save files/folders and open them
-    for (const entry of templateContents) {
+    const entries = []
+    for await (const entry of templateContents) {
+      entries.push(entry)
       entry.sourcePath = getRelativePath(template.uri, entry.uri)
       try {
         // Pluck a few properties so they can't mutate the item itself.
@@ -50,17 +52,17 @@ export default async (resource: vscode.Uri | string | undefined) => {
       entry.absoluteDestinationFilePath = vscode.Uri.joinPath(entry.destinationPath.startsWith('/') ? workspaceUri : targetUri, entry.destinationPath)
     }
 
-    for (const item of templateContents) {
-      if (item.skip || item.dirent.isDirectory()) continue
+    for (const entry of entries) {
+      if (entry.skip || entry.dirent.isDirectory()) continue
       const thisTemplateContext = vm.createContext(_.cloneDeep(_.omit(context, 'pig')))
       try {
-        item.renderedContent = vm.runInContext(`(() => \`${item.content}\`)()`, thisTemplateContext)
+        entry.renderedContent = vm.runInContext(`(() => \`${entry.content}\`)()`, thisTemplateContext)
       } catch (ex) {
-        return showException(ex, template.name, `rendering template ${item.sourcePath}`, item.uri)
+        return showException(ex, template.name, `rendering template ${entry.sourcePath}`, entry.uri)
       }
     }
 
-    await createTemplateContents(templateContents.filter(item => !item.skip))
+    await createTemplateContents(entries.filter(entry => !entry.skip))
   } catch (ex) {
     console.log('Uncaught Template Pig exception:', ex)
   }

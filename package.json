@@ -2,7 +2,7 @@
   "name": "template-pig",
   "displayName": "Template Pig",
   "description": "Create and use simple to complex file/folder templates.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "repository": "github:OlsonDev/TemplatePig",
   "publisher": "OlsonDev",

@@ -40,7 +40,7 @@ const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
       name: $.sentenceCase(name),
       detail: null,
       description: null,
-      execute: (paths) => ({}),
+      executeAsync: (paths) => ({}),
       getDestinationPath: (entry, context, paths) => entry.sourcePath,
     },
   })

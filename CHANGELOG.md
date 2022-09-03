@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.0.4] - 2022-09-03
+- Fix bugs
+
 ## [1.0.3] - 2022-09-03
 - `.pig.js` now has `log(…)` in context from Template Pig.
 
