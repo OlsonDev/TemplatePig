@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [1.0.5] - 2022-09-03
+- Make most variables/functions available globally in `.pig.js` also available in template items.
+
 ## [1.0.4] - 2022-09-03
 - Fix bugs
 

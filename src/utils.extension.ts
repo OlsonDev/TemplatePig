@@ -9,33 +9,37 @@ import * as vscode from 'vscode'
 
 const outputChannel = vscode.window.createOutputChannel('Template Pig', 'md')
 
+export const createContext = (extra = {}) => vm.createContext({
+  _,
+  ...$,
+  addIrregularRule,
+  addPluralRule,
+  addSingularRule,
+  addUncountableRule,
+  isPlural,
+  isSingular,
+  plural,
+  singular,
+  option: label => ({ label, key: $.pascalCase(label) }),
+  prepicked: label => ({ label, key: $.pascalCase(label), picked: true }),
+  toPickedKeys: array => Object.assign({}, ...array.map(item => ({ [item.key ?? item.label]: true }))),
+  showQuickPick: vscode.window.showQuickPick,
+  showInputBox: vscode.window.showInputBox,
+  getFileContent,
+  getFolderContents,
+  getRelativePath,
+  toFileUri,
+  /* eslint-disable @typescript-eslint/naming-convention */
+  Uri: vscode.Uri,
+  QuickPickItemKind: vscode.QuickPickItemKind,
+  QuickInputButtons: vscode.QuickInputButtons,
+  /* eslint-enable @typescript-eslint/naming-convention */
+  ...extra,
+})
+
 const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
-  const ctx = vm.createContext({
-    _,
-    ...$,
-    addIrregularRule,
-    addPluralRule,
-    addSingularRule,
-    addUncountableRule,
-    isPlural,
-    isSingular,
-    plural,
-    singular,
-    option: label => ({ label, key: $.pascalCase(label) }),
-    prepicked: label => ({ label, key: $.pascalCase(label), picked: true }),
-    toPickedKeys: array => Object.assign({}, ...array.map(item => ({ [item.key ?? item.label]: true }))),
-    showQuickPick: vscode.window.showQuickPick,
-    showInputBox: vscode.window.showInputBox,
-    getFileContent,
-    getFolderContents,
-    getRelativePath,
-    toFileUri,
+  const ctx = createContext({
     log: value => outputChannel.appendLine(`${ctx.pig.name}: ${value}`),
-    /* eslint-disable @typescript-eslint/naming-convention */
-    Uri: vscode.Uri,
-    QuickPickItemKind: vscode.QuickPickItemKind,
-    QuickInputButtons: vscode.QuickInputButtons,
-    /* eslint-enable @typescript-eslint/naming-convention */
     pig: {
       name: $.sentenceCase(name),
       detail: null,

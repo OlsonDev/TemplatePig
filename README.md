@@ -102,76 +102,79 @@ You can also put empty folders in your template. They follow the same rules as f
   - To work around this, you can add an empty `.pignore` or `.pigignore` file to the folder.
 
 ## More on `.pig.js`
+These values are available globally within your `.pig.js` file.
 - `pig.name`, `pig.detail`, and `pig.description` are used to describe your template when the user is prompted about which template they’d like to instantiate.
   - `pig.name` is defaulted to the sentence-case version of your folder; you don’t have to set it!
   - `pig.detail` is put next to `pig.name` in a dimmer text. It may be cropped, but hovering it will reveal the entirety of the text.
   - `pig.description` is like `pig.detail` in all ways except it’s put below `pig.name`.
-- Several useful libraries and functions are injected and available globally.
-  - [Lodash](https://lodash.com), available as the traditional `_`.
-  - [change-case](https://github.com/blakeembrey/change-case) (both core and some of the more useful non-core functions), available globally:
-    - `camelCase()`
-    - `capitalCase()`
-    - `constantCase()`
-    - `dotCase()`
-    - `headerCase()`
-    - `isLowerCase()`
-    - `isUpperCase()`
-    - `localeLowerCase()`
-    - `localeUpperCaseFirst()`
-    - `lowerCase()`
-    - `lowerCaseFirst()`
-    - `noCase()` (also aliased as `lowerSentenceCase()` and `spaceCase()`)
-    - `paramCase()` (also aliased as `kebabCase()`)
-    - `pascalCase()`
-    - `pathCase()`
-    - `sentenceCase()`
-    - `snakeCase()`
-    - `titleCase()`
-    - `upperCase()`
-    - `upperCaseFirst()`
-      - Basically, no `swapCase()` or `spongeCase()`.
-  - [`pluralize`](https://github.com/plurals/pluralize), available without needing the prefix `pluralize.` (i.e. these functions are global)
-    - `addIrregularRule()`
-    - `addPluralRule()`
-    - `addSingularRule()`
-    - `addUncountableRule()`
-    - `isPlural()`
-    - `isSingular()`
-    - `plural()`
-    - `singular()`
-  - From VS Code API:
-    - [`showQuickPick()`](https://code.visualstudio.com/api/references/vscode-api#QuickPick<T>)
-    - [`showInputBox()`](https://code.visualstudio.com/api/references/vscode-api#InputBox)
-    - [`QuickPickItemKind`](https://code.visualstudio.com/api/references/vscode-api#QuickPickItemKind)
-      - Official documentation is currently lacking, but there's two useful values: `Separator` and `Default`.
-    - [`QuickInputButtons`](https://code.visualstudio.com/api/references/vscode-api#QuickInputButtons)
-  - Template Pig specific:
-    - `option(label)`
-      - Builds an option object with the given `label`, and a `key` that’s the `pascalCase`-ified `label`.
-      - The `key` is useful in combination with `toPickedKeys()` below.
-    - `prepicked(label)`
-      - Builds an option object like `option(label)` but also sets `picked: true`.
-    - `toPickedKeys(array)`
-      - Converts `[{ key: 'Foo' }, { key: 'Bar' }, { key: 'Baz' }]` to `{ Foo: true, Bar: true, Baz: true }`.
-      - You likely will get an array similar to above when calling `showQuickPick(options, { canPickMany: true })`.
-      - This is useful so your templates can simply `${selected.Foo ? 'Foo stuff' : ''}` instead of `selected.includes('Foo')`.
-    - `getFileContent(uri)`
-      - Returns the file’s content as a string, read with UTF-8 encoding.
-      - Returns `null` if there’s an error reading the file.
-    - `getFolderContents(uri, options = {…})`
-      - Returns an [`async` generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
-      - Yields files and folders underneath the `uri`.
-      - Skips files named `.pig.js`, `.pignore`, and `.pigignore`.
-      - `options.yieldNonEmptyFolders`: defaults to `false`.
-        - By default, only yields folders when they don’t yield child items. That is, it’ll only yield a folder that’s either empty or only contains some combination of the aforementioned specific files. Or has symbolic links or other weird stuff (that’d be skipped).
-      - `options.maxDepth`: defaults to `Infinity`. Specifies how many folders deep would you like to go.
-    - `getRelativePath(ancestorUri, descendantUri)`
-      - Given `Uri`s pointing to `C:\Foo\Bar` and `C:\Foo\Bar\Baz\Qux.txt`, returns the string `'Baz\Qux.txt'`
-      - Does **not** handle cases when `descendantUri` is actually a sibling or ancestor's descendant.
-    - `toFileUri(path)`
-      - Returns path normalized then wrapped in a VS Code `Uri` object with the file scheme.
-    - `log(value)`
-      - Logs `value` to the VS Code "Template Pig" output channel.
+- `log(value)`
+  - Logs `value` to the VS Code "Template Pig" output channel.
+
+## Global scope
+Several useful libraries and functions are injected and available globally, both in `.pig.js` and your template items.
+- [Lodash](https://lodash.com), available as the traditional `_`.
+- [change-case](https://github.com/blakeembrey/change-case) (both core and some of the more useful non-core functions), available globally:
+  - `camelCase()`
+  - `capitalCase()`
+  - `constantCase()`
+  - `dotCase()`
+  - `headerCase()`
+  - `isLowerCase()`
+  - `isUpperCase()`
+  - `localeLowerCase()`
+  - `localeUpperCaseFirst()`
+  - `lowerCase()`
+  - `lowerCaseFirst()`
+  - `noCase()` (also aliased as `lowerSentenceCase()` and `spaceCase()`)
+  - `paramCase()` (also aliased as `kebabCase()`)
+  - `pascalCase()`
+  - `pathCase()`
+  - `sentenceCase()`
+  - `snakeCase()`
+  - `titleCase()`
+  - `upperCase()`
+  - `upperCaseFirst()`
+    - Basically, no `swapCase()` or `spongeCase()`.
+- [`pluralize`](https://github.com/plurals/pluralize), available without needing the prefix `pluralize.` (i.e. these functions are global)
+  - `addIrregularRule()`
+  - `addPluralRule()`
+  - `addSingularRule()`
+  - `addUncountableRule()`
+  - `isPlural()`
+  - `isSingular()`
+  - `plural()`
+  - `singular()`
+- From VS Code API:
+  - [`showQuickPick()`](https://code.visualstudio.com/api/references/vscode-api#QuickPick<T>)
+  - [`showInputBox()`](https://code.visualstudio.com/api/references/vscode-api#InputBox)
+  - [`QuickPickItemKind`](https://code.visualstudio.com/api/references/vscode-api#QuickPickItemKind)
+    - Official documentation is currently lacking, but there's two useful values: `Separator` and `Default`.
+  - [`QuickInputButtons`](https://code.visualstudio.com/api/references/vscode-api#QuickInputButtons)
+- Template Pig specific:
+  - `option(label)`
+    - Builds an option object with the given `label`, and a `key` that’s the `pascalCase`-ified `label`.
+    - The `key` is useful in combination with `toPickedKeys()` below.
+  - `prepicked(label)`
+    - Builds an option object like `option(label)` but also sets `picked: true`.
+  - `toPickedKeys(array)`
+    - Converts `[{ key: 'Foo' }, { key: 'Bar' }, { key: 'Baz' }]` to `{ Foo: true, Bar: true, Baz: true }`.
+    - You likely will get an array similar to above when calling `showQuickPick(options, { canPickMany: true })`.
+    - This is useful so your templates can simply `${selected.Foo ? 'Foo stuff' : ''}` instead of `selected.includes('Foo')`.
+  - `getFileContent(uri)`
+    - Returns the file’s content as a string, read with UTF-8 encoding.
+    - Returns `null` if there’s an error reading the file.
+  - `getFolderContents(uri, options = {…})`
+    - Returns an [`async` generator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/AsyncGenerator)
+    - Yields files and folders underneath the `uri`.
+    - Skips files named `.pig.js`, `.pignore`, and `.pigignore`.
+    - `options.yieldNonEmptyFolders`: defaults to `false`.
+      - By default, only yields folders when they don’t yield child items. That is, it’ll only yield a folder that’s either empty or only contains some combination of the aforementioned specific files. Or has symbolic links or other weird stuff (that’d be skipped).
+    - `options.maxDepth`: defaults to `Infinity`. Specifies how many folders deep would you like to go.
+  - `getRelativePath(ancestorUri, descendantUri)`
+    - Given `Uri`s pointing to `C:\Foo\Bar` and `C:\Foo\Bar\Baz\Qux.txt`, returns the string `'Baz\Qux.txt'`
+    - Does **not** handle cases when `descendantUri` is actually a sibling or ancestor's descendant.
+  - `toFileUri(path)`
+    - Returns path normalized then wrapped in a VS Code `Uri` object with the file scheme.
 
 ## Extension settings
 This extension acknowledges the following settings:

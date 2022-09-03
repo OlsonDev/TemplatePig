@@ -1,5 +1,5 @@
 import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetUri, getWorkspaceUri, showError, showException, showInfo } from './utils.vscode'
-import { getAvailableTemplates, pickTemplate } from './utils.extension'
+import { createContext, getAvailableTemplates, pickTemplate } from './utils.extension'
 import { getFolderContents, getRelativePath, isExistingDirectory } from './utils.fs'
 import * as _ from 'lodash'
 import * as vm from 'node:vm'
@@ -54,7 +54,7 @@ export default async (resource: vscode.Uri | string | undefined) => {
 
     for (const entry of entries) {
       if (entry.skip || entry.dirent.isDirectory()) continue
-      const thisTemplateContext = vm.createContext(_.cloneDeep(_.omit(context, 'pig')))
+      const thisTemplateContext = createContext(context)
       try {
         entry.renderedContent = vm.runInContext(`(() => \`${entry.content}\`)()`, thisTemplateContext)
       } catch (ex) {
