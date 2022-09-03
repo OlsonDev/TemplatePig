@@ -56,7 +56,16 @@ export default async (resource: vscode.Uri | string | undefined) => {
       if (entry.skip || entry.dirent.isDirectory()) continue
       const thisTemplateContext = createContext(context)
       try {
-        entry.renderedContent = vm.runInContext(`(() => \`${entry.content}\`)()`, thisTemplateContext)
+        const { content } = entry
+        const regex = /(?:\s*<pig>(?<script>.*)<\/pig>\n?)?(?<template>.*)/s
+        const match = content.match(regex)
+        const code = match.groups.script
+          ? `(() => {
+            ${match.groups.script}
+            return \`${match.groups.template}\`
+          })()`
+          : `(() => \`${entry.content}\`)()`
+        entry.renderedContent = vm.runInContext(code, thisTemplateContext)
       } catch (ex) {
         return showException(ex, template.name, `rendering template ${entry.sourcePath}`, entry.uri)
       }

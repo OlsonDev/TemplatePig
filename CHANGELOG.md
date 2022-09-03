@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - 2022-09-03
+- You can now embed JavaScript in between `<pig>` … `</pig>` at the beginning of a template item to initialize helpers that are specific to that file.
+  - A single trailing newline will be stripped after the closing `</pig>` tag; everything after that will be considered template content.
+
 ## [1.0.5] - 2022-09-03
 - Make most variables/functions available globally in `.pig.js` also available in template items.
 

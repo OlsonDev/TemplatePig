@@ -176,6 +176,23 @@ Several useful libraries and functions are injected and available globally, both
   - `toFileUri(path)`
     - Returns path normalized then wrapped in a VS Code `Uri` object with the file scheme.
 
+## Template item syntax
+Everything in a template item is evaluated as a [JavaScript template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). However, sometimes it can be useful to set up file-specific variables or helper functions. For example, if you have a highly dynamic template that conditionally adds several contiguous sections and the whitespace between them is important, that can result in a lot of `${…}${…}${…}${…}` on a single line. Reading one really long line of code isn’t fun.
+
+Enter the `<pig>` tag! If you place one of these at the beginning of your template item, you can add additional JavaScript between it and its corresponding `</pig>`. A single immediate newline following the `</pig>` will be stripped (if existent). Everything after that is your template item content.
+
+Here’s a simple example template item leveraging this feature:
+```
+<pig>
+  // Assume `methodNames` came from `pig.executeAsync(…)`'s return context.
+  const allMethods = methodNames.map(m => `function ${m}() {\n  \n}`).join('\n\n')
+</pig>
+public class ${name} {
+${allMethods}
+}
+```
+
+
 ## Extension settings
 This extension acknowledges the following settings:
 - `templatePig.templatesPath`
