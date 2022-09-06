@@ -56,8 +56,8 @@ async function* getFolderContentsImpl(directoryUri: vscode.Uri, options) {
 }
 
 export const getRelativePath = (ancestorUri: vscode.Uri, descendantUri: vscode.Uri) => {
-  const afsPath = ancestorUri.fsPath
-  const dfsPath = descendantUri.fsPath
-  const regex = new RegExp(`^${_.escapeRegExp(afsPath)}[/\\\\]`)
-  return dfsPath.replace(regex, '')
+  const ancestorPath = ancestorUri.toString()
+  const descendantPath = descendantUri.toString()
+  const regex = new RegExp(`^${_.escapeRegExp(ancestorPath)}/`)
+  return descendantPath.replace(regex, '')
 }

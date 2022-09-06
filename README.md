@@ -171,10 +171,10 @@ Several useful libraries and functions are injected and available globally, both
       - By default, only yields folders when they don’t yield child items. That is, it’ll only yield a folder that’s either empty or only contains some combination of the aforementioned specific files. Or has symbolic links or other weird stuff (that’d be skipped).
     - `options.maxDepth`: defaults to `Infinity`. Specifies how many folders deep would you like to go.
   - `getRelativePath(ancestorUri, descendantUri)`
-    - Given `Uri`s pointing to `C:\Foo\Bar` and `C:\Foo\Bar\Baz\Qux.txt`, returns the string `'Baz\Qux.txt'`
+    - Given `file:` scheme `Uri`s pointing to `C:\Foo\Bar` and `C:\Foo\Bar\Baz\Qux.txt`, returns the string `'Baz/Qux.txt'`
     - Does **not** handle cases when `descendantUri` is actually a sibling or ancestor's descendant.
   - `toFileUri(path)`
-    - Returns path normalized then wrapped in a VS Code `Uri` object with the file scheme.
+    - Returns path normalized then wrapped in a VS Code `Uri` object with the `file:` scheme.
 
 ## Template item syntax
 Everything in a template item is evaluated as a [JavaScript template literal](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals). However, sometimes it can be useful to set up file-specific variables or helper functions. For example, if you have a highly dynamic template that conditionally adds several contiguous sections and the whitespace between them is important, that can result in a lot of `${…}${…}${…}${…}` on a single line. Reading one really long line of code isn’t fun.

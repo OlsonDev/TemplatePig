@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.0] - 2022-09-06
+- `getRelativePath(ancestorUri, descendantUri)` now returns the path with forward slashes instead of back slashes; it was annoying to have `case 'Foo\\Bar.txt'` in `getDestinationPath(…)` implementations.
+
 ## [2.0.0] - 2022-09-03
 - You can now embed JavaScript in between `<pig>` … `</pig>` at the beginning of a template item to initialize helpers that are specific to that file.
   - A single trailing newline will be stripped after the closing `</pig>` tag; everything after that will be considered template content.
