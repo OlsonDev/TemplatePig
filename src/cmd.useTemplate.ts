@@ -5,6 +5,8 @@ import * as _ from 'lodash'
 import * as vm from 'node:vm'
 import * as vscode from 'vscode'
 
+let lastTemplate = null
+let lastContext = null
 
 export default async (resource: vscode.Uri | string | undefined) => {
   try {
@@ -14,16 +16,22 @@ export default async (resource: vscode.Uri | string | undefined) => {
     const validPaths = templatePaths.filter(isExistingDirectory)
     const templates = (await Promise.all(validPaths.map(async (path) => await getAvailableTemplates(path)))).flat()
     if (!templates.length) return showError('No templates found!')
-    const template = await pickTemplate(templates)
+    const template = await pickTemplate(templates, lastTemplate)
     if (!template) return showInfo('No template selected')
     const paths = { workspaceUri, targetUri }
     let context
-    try {
-      context = await template.context.pig.executeAsync(paths)
-    } catch (ex) {
-      return showException(ex, template.name, 'calling executeAsync(…)', template.pigJsUri)
+    if (template === lastTemplate) {
+      context = lastContext
+    } else {
+      try {
+        context = await template.context.pig.executeAsync(paths)
+      } catch (ex) {
+        return showException(ex, template.name, 'calling executeAsync(…)', template.pigJsUri)
+      }
     }
     if (!context) return showInfo('Aborted')
+    lastContext = context
+    lastTemplate = template
     const templateContents = getFolderContents(template.uri)
 
     // Process templateContents multiple times:

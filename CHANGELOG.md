@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.1] - 2022-09-08
+- You can now rerun your last template with the same answers (effectively skipping `pig.executeAsync(…)`). This can be useful when you’re debugging a template item’s contents contents or the `getDestinationPath(…)` implementation.
+
 ## [3.0.0] - 2022-09-06
 - `getRelativePath(ancestorUri, descendantUri)` now returns the path with forward slashes instead of back slashes; it was annoying to have `case 'Foo\\Bar.txt'` in `getDestinationPath(…)` implementations.
 

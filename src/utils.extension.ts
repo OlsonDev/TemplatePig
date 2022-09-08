@@ -69,19 +69,26 @@ export const getAvailableTemplates = async (templatesUri: vscode.Uri) => {
       const uri = vscode.Uri.joinPath(templatesUri, dirent.name)
       const pigJsUri = vscode.Uri.joinPath(uri, '.pig.js')
       const context = getTemplateContext(dirent.name, pigJsUri)
-      return { uri, name: dirent.name, pigJsUri, context }
+      return { uri, name: dirent.name, pigJsUri, context, templatesUri }
     })))
     .filter(Boolean)
 }
 
-export const pickTemplate = async (templates) => {
+export const pickTemplate = async (templates, lastTemplate) => {
   if (!templates.length) return null
-  if (templates.length === 1) return templates[0]
+  if (templates.length === 1 && lastTemplate === null) return templates[0]
+
+  if (lastTemplate) {
+    lastTemplate.context = getTemplateContext(lastTemplate.name, lastTemplate.templatesUri)
+    lastTemplate.label = `Rerun last template with same answers (${lastTemplate.name})`
+    templates.splice(0, 0, lastTemplate)
+  }
+
   const items = templates.map(template => {
     const { pig } = template.context
     return {
       template,
-      label: pig.name,
+      label: template.label ?? pig.name,
       detail: pig.detail,
       description: pig.description,
     }
