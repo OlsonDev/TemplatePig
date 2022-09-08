@@ -49,7 +49,7 @@ ${sections.Settings ? '## Settings\n- ' : ''}
 
 ${sections.KnownIssues ? '## Known issues\n- ' : ''}
 ```
-- Notice we’re using [JavaScript template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) syntax to interpolate values from the *context* returned from `pig.executeAsync(…)` (they’re available globally).
+- Notice we’re using [JavaScript template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals) syntax to interpolate values from the `context` object returned from `pig.executeAsync(…)` (they’re available globally).
 - Also note that of course this document will result in a bunch of whitespace if a `sectionOptions` option is unselected. That’s up to you to make your rendered template pretty.
 
 ## Use a template
@@ -57,9 +57,26 @@ ${sections.KnownIssues ? '## Known issues\n- ' : ''}
   - If you only have one template, it’ll begin executing.
   - If you have more than one template, you’ll be prompted to select one.
 - The selected template will then call its `pig.executeAsync(…)` method, which may prompt you for additional information.
-- After that, each file in the template subfolder will be rendered with the *context* value returned from `pig.executeAsync(…)`.
+- The `context` object returned from `pig.executeAsync(…)` will then be passed to `pig.transformContext(…)` to add any additional context.
+- After that, each file in the template subfolder will be rendered with the `context` object returned from `pig.transformContext(…)`.
 - After all template files have been rendered, they’ll be saved to disk.
   - Well, there is one step before that. More on that below.
+
+## `pig.executeAsync(paths)`
+Implement this method to prompt the user for dynamic information. See the **Global scope** section below for ways you can prompt the user. This method should return an object that can be made available to your template items; all the top-level keys will be available globally in your template items. If you want to abort the template instantiation process, return a falsy value. `paths` is an object with two keys:
+- `paths.workspaceUri` is your project’s root folder.
+- `paths.targetUri` is where the template was instantiated (typically which folder was right-clicked).
+
+## `pig.transformContext(context)`
+While you’re developing your template, you’ll likely want to test it early and often. Once you get the prompt flow down, you’ll likely start working on your template items. However, testing them over and over can become tedious if you have to keep filling out your form. We’ve got you covered! After you successfully complete a form, we keep track of the `context` object returned from `pig.executeAsync(…)`. But, sometimes, you want to add more context to be available to your template items. That’s where `pig.transformContext(…)` comes in. When you rerun the last template, that `context` object will get passed to your (potentially new/updated) `pig.transformContext(…)` method. Whatever you return will *actually* be the `context` object available to your template items. For this reason, it is recommended that `pig.executeAsync(…)` return the raw answers to your prompts and then `pig.transformContext(…)` can add in whatever manipulations you may need — `pascalCase()`ing something, `kebabCase()`ing something else, whatever. Here’s an example:
+
+```js
+pig.transformContext = ctx => ({
+  ...ctx,
+  pcName: pascalCase(ctx.name),
+  kbName: kebabCase(ctx.name),
+})
+```
 
 ## Setting a template file/folder’s destination path
 So far you’ve seen being able to right-click a folder and instantiate your template there. But, what if you want some files to wind up there, but others need to go in specific places in your project? That’s where `pig.getDestinationPath(…)` comes in! Just add something like this in your `.pig.js` file:
@@ -71,7 +88,7 @@ pig.getDestinationPath = (entry, context, paths) => {
   // `entry.sourcePath` is a string that will be relative to this template subfolder (no leading forward slash).
   // `entry.uri` is a `file`-schemed VS Code Uri object pointing to this item.
   // `entry.dirent` is a Node.js fs.Dirent object related to this item. You can determine if it’s a file or folder by using `entry.dirent.isFile()` or `entry.dirent.isDirectory()`.
-  // `context` is the value your `pig.executeAsync(…)` returned.
+  // `context` is the value your `pig.transformContext(…)` returned.
   // `paths.workspaceUri` is your project’s root folder.
   // `paths.targetUri` is where the template was instantiated (typically which folder was right-clicked).
   // Keep in mind this `switch`’s `case`s are case-sensitive!

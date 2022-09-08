@@ -32,6 +32,7 @@ export default async (resource: vscode.Uri | string | undefined) => {
     if (!context) return showInfo('Aborted')
     lastContext = context
     lastTemplate = template
+    context = template.context.pig.transformContext(context)
     const templateContents = getFolderContents(template.uri)
 
     // Process templateContents multiple times:

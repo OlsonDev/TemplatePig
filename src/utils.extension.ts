@@ -45,6 +45,7 @@ const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
       detail: null,
       description: null,
       executeAsync: (paths) => ({}),
+      transformContext: ctx => ctx,
       getDestinationPath: (entry, context, paths) => entry.sourcePath,
     },
   })
@@ -66,10 +67,11 @@ export const getAvailableTemplates = async (templatesUri: vscode.Uri) => {
   return (await Promise.all(templates
     .map(async (dirent) => {
       if (!dirent.isDirectory()) return null
-      const uri = vscode.Uri.joinPath(templatesUri, dirent.name)
+      const { name } = dirent
+      const uri = vscode.Uri.joinPath(templatesUri, name)
       const pigJsUri = vscode.Uri.joinPath(uri, '.pig.js')
-      const context = getTemplateContext(dirent.name, pigJsUri)
-      return { uri, name: dirent.name, pigJsUri, context, templatesUri }
+      const context = getTemplateContext(name, pigJsUri)
+      return { uri, name, pigJsUri, context, templatesUri }
     })))
     .filter(Boolean)
 }
@@ -79,8 +81,8 @@ export const pickTemplate = async (templates, lastTemplate) => {
   if (templates.length === 1 && lastTemplate === null) return templates[0]
 
   if (lastTemplate) {
-    lastTemplate.context = getTemplateContext(lastTemplate.name, lastTemplate.templatesUri)
-    lastTemplate.label = `Rerun last template with same answers (${lastTemplate.name})`
+    lastTemplate.context = getTemplateContext(lastTemplate.name, lastTemplate.pigJsUri)
+    lastTemplate.label = `Rerun last template with same answers (${lastTemplate.context.pig.name})`
     templates.splice(0, 0, lastTemplate)
   }
 
