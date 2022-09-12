@@ -48,7 +48,7 @@ export const getTargetUri = async (resource: vscode.Uri | string | undefined, wo
   if (typeof resource === 'string') {
     if (resource === '__current') return parentFolderOfActiveFile()
     if (!workspaceUri) {
-      vscode.window.showErrorMessage(`Couldn't find workspace.`)
+      vscode.window.showErrorMessage(`Couldn’t find workspace.`)
       return
     }
     return vscode.Uri.parse(`${workspaceUri}/${resource}`)
@@ -93,20 +93,28 @@ const range = new vscode.Range(start, end)
 const createFileOrDirectory = async (wsEdit: vscode.WorkspaceEdit, item) => {
   if (item.dirent.isDirectory()) {
     mkdirSync(item.absoluteDestinationFilePath.fsPath, { recursive: true })
-    return null
+    return
   }
 
   // VS Code will automatically make the necessary folders.
   const newPath = item.absoluteDestinationFilePath
   if (existsSync(newPath.fsPath)) {
     wsEdit.replace(newPath, range, item.renderedContent)
-  } else {
-    wsEdit.createFile(newPath)
-    wsEdit.insert(newPath, new vscode.Position(0, 0), item.renderedContent)
+    return
   }
+
+  wsEdit.createFile(newPath)
+  wsEdit.insert(newPath, start, item.renderedContent)
 }
 
-export const createTemplateContents = async (templateContents: any[]) => {
+const closeDocument = async (uri: vscode.Uri) => {
+  const document = await vscode.workspace.openTextDocument(uri)
+  if (document.isClosed) return
+  await vscode.window.showTextDocument(document, { preview: true, preserveFocus: false })
+  await vscode.commands.executeCommand('workbench.action.closeActiveEditor')
+}
+
+export const createTemplateContents = async (templateContents: any[], template, paths) => {
   if (!templateContents) return
   const wsEdit = new vscode.WorkspaceEdit()
   for (const item of templateContents) {
@@ -116,12 +124,14 @@ export const createTemplateContents = async (templateContents: any[]) => {
   await vscode.workspace.applyEdit(wsEdit)
 
   // TODO: Without the timeout, this can be buggy. With the timeout, every file ends up getting opened.
-  //       Ideally, the user could configure which files should be left opened, where the cursor should be located,
-  //       and potentially even which panel (top/bottom/left/right) they'd end up in.
+  //       Ideally, the user could configure where the cursor should be located, and potentially
+  //       even which tab group (top/bottom/left/right, etc) they'd end up in.
   setTimeout(async () => {
     for (const item of templateContents) {
       if (item.dirent.isDirectory()) continue
       await openAndSaveFile(item.absoluteDestinationFilePath)
+      if (template.context.pig.shouldOpenDocument(item.slimItem, template.context, paths)) continue
+      await closeDocument(item.absoluteDestinationFilePath)
     }
   }, 1000)
 }

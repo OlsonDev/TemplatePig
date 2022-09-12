@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.3] - 2022-09-12
+- Add ability to control which template files are left open by implementing `pig.shouldOpenDocument(…)`.
+
 ## [3.0.2] - 2022-09-08
 - Add ability to add a `pig.transformContext(…)` method to your `.pig.js` which adds additional context. This can be useful when you’re using the ability to rerun your last template and your `pig.executeAsync(…)` and you don’t need to ask new questions but you do want to provide more computed values to your template items.
 - Fix bug with rerunning your last template.

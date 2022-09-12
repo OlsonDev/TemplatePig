@@ -47,6 +47,7 @@ const getTemplateContext = (name: string, pigJsUri: vscode.Uri): any => {
       executeAsync: (paths) => ({}),
       transformContext: ctx => ctx,
       getDestinationPath: (entry, context, paths) => entry.sourcePath,
+      shouldOpenDocument: (entry, context, paths) => true,
     },
   })
 

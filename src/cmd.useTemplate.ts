@@ -45,12 +45,12 @@ export default async (resource: vscode.Uri | string | undefined) => {
       entry.sourcePath = getRelativePath(template.uri, entry.uri)
       try {
         // Pluck a few properties so they can't mutate the item itself.
-        const slimItem = {
+        entry.slimItem = {
           sourcePath: entry.sourcePath,
           dirent: entry.dirent,
           uri: entry.uri,
         }
-        entry.destinationPath = template.context.pig.getDestinationPath(slimItem, context, paths)
+        entry.destinationPath = template.context.pig.getDestinationPath(entry.slimItem, context, paths)
       } catch (ex) {
         return showException(ex, template.name, `calling getDestinationPath("${entry.sourcePath.replace('"', '\\"')}", …)`, template.pigJsUri)
       }
@@ -80,7 +80,7 @@ export default async (resource: vscode.Uri | string | undefined) => {
       }
     }
 
-    await createTemplateContents(entries.filter(entry => !entry.skip))
+    await createTemplateContents(entries.filter(entry => !entry.skip), template, paths)
   } catch (ex) {
     console.log('Uncaught Template Pig exception:', ex)
   }

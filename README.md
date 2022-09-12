@@ -110,6 +110,22 @@ pig.getDestinationPath = (entry, context, paths) => {
 }
 ```
 
+## `pig.shouldOpenDocument(entry, context, paths)`
+Undoubtedly some of the documents you create won’t be immediately necessary to manually edit/inspect after template instantiation. To declutter your workspace, you can implement `pig.shouldOpenDocument(…)`. Simply return a truthy value to leave the document open, or a falsy value to close it. 
+
+**Please note:** Currently, all documents will be opened and then the ones you don’t want open will close a second later. While I’m fairly certain it can be achieved, VS Code’s API doesn’t make it easy to make all of your template’s changes in a `WorkspaceEdit`, deny tab creation, and the like without hooking into more events and having to track state manually. I opted for the simple solution for now.
+
+```js
+pig.shouldOpenDocument = (entry, context, paths) => {
+  // Arguments are identical to `getDestinationPath(…)` above.
+  const { sourcePath } = entry
+  switch (sourcePath) {
+    case 'OpenMe.txt': return true
+    default: return false
+  }
+}
+```
+
 ## Empty folders
 You can also put empty folders in your template. They follow the same rules as files when passed to `pig.getDestinationPath(…)`:
 - They can be placed relative to the target.
