@@ -111,9 +111,7 @@ pig.getDestinationPath = (entry, context, paths) => {
 ```
 
 ## `pig.shouldOpenDocument(entry, context, paths)`
-Undoubtedly some of the documents you create won’t be immediately necessary to manually edit/inspect after template instantiation. To declutter your workspace, you can implement `pig.shouldOpenDocument(…)`. Simply return a truthy value to leave the document open, or a falsy value to close it. 
-
-**Please note:** Currently, all documents will be opened and then the ones you don’t want open will close a second later. While I’m fairly certain it can be achieved, VS Code’s API doesn’t make it easy to make all of your template’s changes in a `WorkspaceEdit`, deny tab creation, and the like without hooking into more events and having to track state manually. I opted for the simple solution for now.
+Undoubtedly some of the documents you create won’t be immediately necessary to manually edit/inspect after template instantiation. To declutter your workspace, you can implement `pig.shouldOpenDocument(…)`. Simply return a truthy value to leave the document open, or a falsy value to close it. Here’s an example:
 
 ```js
 pig.shouldOpenDocument = (entry, context, paths) => {
@@ -125,6 +123,12 @@ pig.shouldOpenDocument = (entry, context, paths) => {
   }
 }
 ```
+
+> **Please note:** This experience isn’t ideal; unfortunately, VS Code’s API doesn’t make it easy to make all of your template’s changes in a `WorkspaceEdit` and control whether or not a tab will show up. I’ve tried two approaches, and both have their pros and cons.
+> 1. Create and apply a single `WorkspaceEdit` for the entire template. This resulted in a lot of documents being left open that should’ve been closed and forced me to put an arbitrary `setTimeout` to close documents. For bigger templates, that size would just have to keep increasing.
+> 2. Create and apply a `WorkspaceEdit` for each file in the template. This has a lot more flickering of tabs opening and then closing, but the end state is more often what you want: open the documents that should be open, and close those that should not.
+>
+> I'm currently opting for option #2 for consistency. There are a handful of related GitHub issues to fix this behavior with VS Code’s API, but it doesn’t seem like it’ll be fixed anytime soon.
 
 ## Empty folders
 You can also put empty folders in your template. They follow the same rules as files when passed to `pig.getDestinationPath(…)`:

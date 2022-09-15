@@ -35,7 +35,7 @@ const parentFolderOfActiveFile = () => {
   return currentFolderUri ? vscode.Uri.parse(currentFolderUri, true) : null
 }
 
-export const getWorkspaceUri = async () => {
+export const getWorkspaceUriAsync = async () => {
   const folders = vscode.workspace.workspaceFolders ?? []
   if (folders.length > 1) {
     const workspace = await vscode.window.showWorkspaceFolderPick({ placeHolder: 'Which workspace would you like to use a template in?' })
@@ -44,7 +44,7 @@ export const getWorkspaceUri = async () => {
   return folders[0]?.uri
 }
 
-export const getTargetUri = async (resource: vscode.Uri | string | undefined, workspaceUri: vscode.Uri | undefined) => {
+export const getTargetUriAsync = async (resource: vscode.Uri | string | undefined, workspaceUri: vscode.Uri | undefined) => {
   if (typeof resource === 'string') {
     if (resource === '__current') return parentFolderOfActiveFile()
     if (!workspaceUri) {
@@ -62,7 +62,7 @@ export const getTargetUri = async (resource: vscode.Uri | string | undefined, wo
   return resource as vscode.Uri | undefined
 }
 
-export const openAndSaveFile = async (uri: vscode.Uri | null) => {
+export const openAndSaveFileAsync = async (uri: vscode.Uri | null) => {
   if (!uri) return
   const document = await vscode.workspace.openTextDocument(uri)
   await document.save()
@@ -72,7 +72,7 @@ export const openFile = async (filePath: string) => {
   if (existsSync(filePath)) await vscode.window.showTextDocument(vscode.Uri.file(filePath), { preview: false })
 }
 
-export const getLocalTemplatePath = async (resourceUri: vscode.Uri | undefined) => {
+export const getLocalTemplatePathAsync = async (resourceUri: vscode.Uri | undefined) => {
   const configTemplatesPath = readConfig('templatesPath') || '.templates'
   const workspace = resourceUri
     ? vscode.workspace.getWorkspaceFolder(resourceUri)
@@ -90,48 +90,48 @@ export const getGlobalTemplatePath = () => {
 const start = new vscode.Position(0, 0)
 const end = new vscode.Position(Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER)
 const range = new vscode.Range(start, end)
-const createFileOrDirectory = async (wsEdit: vscode.WorkspaceEdit, item) => {
+const createFileOrDirectoryAsync = async (item, context, paths) => {
   if (item.dirent.isDirectory()) {
     mkdirSync(item.absoluteDestinationFilePath.fsPath, { recursive: true })
     return
   }
 
+  const wsEdit = new vscode.WorkspaceEdit()
   // VS Code will automatically make the necessary folders.
   const newPath = item.absoluteDestinationFilePath
   if (existsSync(newPath.fsPath)) {
     wsEdit.replace(newPath, range, item.renderedContent)
-    return
+  } else {
+    wsEdit.createFile(newPath)
+    wsEdit.insert(newPath, start, item.renderedContent)
   }
-
-  wsEdit.createFile(newPath)
-  wsEdit.insert(newPath, start, item.renderedContent)
+  
+  await vscode.workspace.applyEdit(wsEdit)
+  await openAndSaveFileAsync(item.absoluteDestinationFilePath)
+  if (context.pig.shouldOpenDocument(item.slimItem, context, paths)) {
+    await openDocumentAsync(item.absoluteDestinationFilePath)
+  } else {
+    // If saving the document takes > 50ms, it'll be opened automatically.
+    // This is a decent attempt to close it. If it's already closed, this will do nothing.
+    await closeDocumentAsync(item.absoluteDestinationFilePath)
+  }
 }
 
-const closeDocument = async (uri: vscode.Uri) => {
+const openDocumentAsync = async (uri: vscode.Uri) => {
+  const document = await vscode.workspace.openTextDocument(uri)
+  await vscode.window.showTextDocument(document, { preview: false, preserveFocus: true })
+}
+
+const closeDocumentAsync = async (uri: vscode.Uri) => {
   const document = await vscode.workspace.openTextDocument(uri)
   if (document.isClosed) return
   await vscode.window.showTextDocument(document, { preview: true, preserveFocus: false })
   await vscode.commands.executeCommand('workbench.action.closeActiveEditor')
 }
 
-export const createTemplateContents = async (templateContents: any[], template, paths) => {
+export const createTemplateContentsAsync = async (templateContents: any[], template, paths) => {
   if (!templateContents) return
-  const wsEdit = new vscode.WorkspaceEdit()
   for (const item of templateContents) {
-    await createFileOrDirectory(wsEdit, item)
+    await createFileOrDirectoryAsync(item, template.context, paths)
   }
-
-  await vscode.workspace.applyEdit(wsEdit)
-
-  // TODO: Without the timeout, this can be buggy. With the timeout, every file ends up getting opened.
-  //       Ideally, the user could configure where the cursor should be located, and potentially
-  //       even which tab group (top/bottom/left/right, etc) they'd end up in.
-  setTimeout(async () => {
-    for (const item of templateContents) {
-      if (item.dirent.isDirectory()) continue
-      await openAndSaveFile(item.absoluteDestinationFilePath)
-      if (template.context.pig.shouldOpenDocument(item.slimItem, template.context, paths)) continue
-      await closeDocument(item.absoluteDestinationFilePath)
-    }
-  }, 1000)
 }

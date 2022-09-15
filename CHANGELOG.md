@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.4] - 2022-09-15
+- Changed how `pig.shouldOpenDocument(…)` works so it’s hopefully more consistent.
+
 ## [3.0.3] - 2022-09-12
 - Add ability to control which template files are left open by implementing `pig.shouldOpenDocument(…)`.
 

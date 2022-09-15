@@ -1,4 +1,4 @@
-import { createTemplateContents, getGlobalTemplatePath, getLocalTemplatePath, getTargetUri, getWorkspaceUri, showError, showException, showInfo } from './utils.vscode'
+import { createTemplateContentsAsync, getGlobalTemplatePath, getLocalTemplatePathAsync, getTargetUriAsync, getWorkspaceUriAsync, showError, showException, showInfo } from './utils.vscode'
 import { createContext, getAvailableTemplates, pickTemplate } from './utils.extension'
 import { getFolderContents, getRelativePath, isExistingDirectory } from './utils.fs'
 import * as _ from 'lodash'
@@ -10,9 +10,9 @@ let lastContext = null
 
 export default async (resource: vscode.Uri | string | undefined) => {
   try {
-    const workspaceUri = await getWorkspaceUri()
-    const targetUri = await getTargetUri(resource, workspaceUri)
-    const templatePaths = [await getLocalTemplatePath(targetUri), await getGlobalTemplatePath()]
+    const workspaceUri = await getWorkspaceUriAsync()
+    const targetUri = await getTargetUriAsync(resource, workspaceUri)
+    const templatePaths = [await getLocalTemplatePathAsync(targetUri), await getGlobalTemplatePath()]
     const validPaths = templatePaths.filter(isExistingDirectory)
     const templates = (await Promise.all(validPaths.map(async (path) => await getAvailableTemplates(path)))).flat()
     if (!templates.length) return showError('No templates found!')
@@ -80,7 +80,7 @@ export default async (resource: vscode.Uri | string | undefined) => {
       }
     }
 
-    await createTemplateContents(entries.filter(entry => !entry.skip), template, paths)
+    await createTemplateContentsAsync(entries.filter(entry => !entry.skip), template, paths)
   } catch (ex) {
     console.log('Uncaught Template Pig exception:', ex)
   }
