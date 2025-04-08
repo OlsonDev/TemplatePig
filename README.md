@@ -30,7 +30,7 @@ pig.executeAsync = async () => {
   if (!title) return // Returning a falsy value (undefined here) aborts template instantiation.
 
   const sectionOptions = [ prepicked('Features'), prepicked('Settings'), prepicked('Known issues') ]
-  const selectedSections = await showQuickPick(baseClassOptions, { title: 'Which sections would you like?', canPickMany: true })
+  const selectedSections = await showQuickPick(sectionOptions, { title: 'Which sections would you like?', canPickMany: true })
   if (!selectedSections) return
 
   const sections = toPickedKeys(selectedSections)
